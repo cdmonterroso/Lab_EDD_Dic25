@@ -1,30 +1,33 @@
+#include <cstdlib> //cabecera para usar el system;
+#include <fstream> //Cabecera pra manejar archivos (leer y escribir)
 #include <iostream>
 using namespace std;
 #include "Nodo.h"
 
-class ListaSimple
+class ListaCircular
 {
 private:
     /* data */
-    //NECSITAMOS UNA REFERENCIA DEL PRIMER Y ULTIMO NODO DE LA LISTA
     Nodo *primero;
     Nodo *ultimo;
 public:
-    ListaSimple(/* args */);
+    ListaCircular(/* args */);
 
     bool estaVacia(){
-        return ((primero == nullptr) && (ultimo == nullptr));
+        return (primero == nullptr) && (ultimo == nullptr);
     }
 
     void insertarInicio(int dato){
         Nodo *nuevo = new Nodo(dato);
-        if (ListaSimple::estaVacia())
+        if (ListaCircular::estaVacia())
         {
+            nuevo->setSiguiente(nuevo); //El primer nodo se apunta a si mismo
             /* Como solo existe el nuevo nodo creado, este será el primero y el último */
             primero = ultimo = nuevo;
         }
         else{
             nuevo->setSiguiente(primero); //Se enlaza el nuevo nodo al primero
+            ultimo->setSiguiente(nuevo); // Se enlaza el ultimo nodo al nuevo
             primero = nuevo; //Se verifica que el nodo creado sea el primero
         }
         
@@ -32,12 +35,14 @@ public:
 
     void insertarFinal(int dato){
         Nodo *nuevo = new Nodo(dato);
-        if (ListaSimple::estaVacia())
+        if (ListaCircular::estaVacia())
         {
             /* code */
+            nuevo->setSiguiente(nuevo);
             primero = ultimo = nuevo;
         }
         else{
+            nuevo->setSiguiente(primero); //Se enlaza el nuevo al primero
             ultimo->setSiguiente(nuevo); //Se enlaza el último nodo al nuevo
             ultimo = nuevo;
         }
@@ -45,7 +50,7 @@ public:
     }
 
     void eliminarInicio(){
-        if (ListaSimple::estaVacia())
+        if (ListaCircular::estaVacia())
         {
             cout << "La lista está vacía" << endl;
         }
@@ -57,14 +62,15 @@ public:
             }
             else{
                 Nodo *segundo = primero->getSiguiente(); //Guardo la referencia del segundo nodo de la lista
+                ultimo->setSiguiente(segundo); //Se enlaza el ultimo nodo al segundo nodo
                 delete primero;
-                primero = segundo; //Verifoco que el segundo nodo pase a ser el primero
+                primero = segundo; //verifico que el segundo nodo pase a ser el primero
             }   
         }
     }
 
     void eliminarFinal(){
-        if (ListaSimple::estaVacia())
+        if (ListaCircular::estaVacia())
         {
             cout << "La lista está vacía" << endl;
         }
@@ -76,7 +82,7 @@ public:
                 primero = ultimo = nullptr; //Se eliminar las referencias
             }
             else{
-                while (temporal != nullptr)
+                do
                 {
                     if (temporal->getSiguiente()==ultimo) //Si el siguiente de temporal es el ultimo, entonces encontre al antepenultimo
                     {
@@ -86,37 +92,70 @@ public:
                         break;
                     }
                     temporal = temporal->getSiguiente(); //Recorriendo la lista   
-                }
+                }while (temporal != primero);
             }
         }
     }
 
     void visualizarLista(){
-        if (ListaSimple::estaVacia())
+        if (ListaCircular::estaVacia())
         {
             cout << "La lista está vacía\n";
         }
         else{
             int nodoDato;
             Nodo *actual = primero;
-            while (actual != nullptr)
+            do
             {
                 nodoDato = actual->getDato();
                 cout << nodoDato << (actual->getSiguiente() != nullptr ? " -> " : "\n");
                 actual = actual->getSiguiente();
-            }
+            }while (actual != primero);
         } 
     }
 
-    ~ListaSimple();
+    void generarReporte(){
+        if (ListaCircular::estaVacia())
+        {
+            /* code */
+        }else{
+            ofstream archivo; //ofstream->escribir - ifstream->leer
+            archivo.open("grafica_LC.dot", ios::out); //
+            archivo << "digraph G { rankdir = LR; " << endl;
+
+            int nodoDato;
+            Nodo *actual = primero;
+            do
+            {
+                nodoDato = actual->getDato();
+                archivo << nodoDato;
+                archivo << " -> ";
+                actual = actual->getSiguiente();
+
+                if (actual == primero)
+                {
+                    archivo << actual->getDato();
+                }
+
+            } while (actual != primero);
+            
+            archivo << "; }";
+            archivo.close();
+            system("dot -Tpng grafica_LC.dot -o grafica_LC.png");
+            system("start grafica_LC.png");
+        }
+        
+    }
+
+    ~ListaCircular();
 };
 
-ListaSimple::ListaSimple(/* args */)
+ListaCircular::ListaCircular(/* args */)
 {
     primero = nullptr;
     ultimo = nullptr;
 }
 
-ListaSimple::~ListaSimple()
+ListaCircular::~ListaCircular()
 {
 }
