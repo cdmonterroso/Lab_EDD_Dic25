@@ -86,9 +86,53 @@ public:
             Recorrido(nodoPtr->getDer());
 
         }
-        
     }
 
+    void generarReporte(){
+        if (estaVacio())
+        {
+            cout << "El árbol está vacío\n"; 
+        }
+        else{
+            archivo.open("grafica_arbol.dot", ios::out);
+            archivo << "digraph G { " << endl;
+
+            imprimirNodos(raiz);
+
+            archivo << " }";
+            archivo.close();
+            system("dot -Tpng grafica_arbol.dot -o grafica_arbol.png");
+            system("start grafica_arbol.png");
+
+        }
+    }
+
+    void imprimirNodos(Nodo* nodoPtr){
+        if (nodoPtr == nullptr)
+        {
+            return;
+        }
+        if (nodoPtr->getIzq() != nullptr)
+        {
+            nodoDato = nodoPtr->getDato();
+            archivo << nodoDato; archivo << "->";
+            nodoDato = nodoPtr->getIzq()->getDato();
+            archivo << nodoDato; archivo << ";";
+
+        }
+        imprimirNodos(nodoPtr->getIzq());
+        
+        if (nodoPtr->getDer() != nullptr)
+        {
+            nodoDato = nodoPtr->getDato();
+            archivo << nodoDato; archivo << "->";
+            nodoDato = nodoPtr->getDer()->getDato();
+            archivo << nodoDato; archivo << ";";
+        }
+        
+        imprimirNodos(nodoPtr->getDer());
+        
+    }
 
 
     ~Arbol();

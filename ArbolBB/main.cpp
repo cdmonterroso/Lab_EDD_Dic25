@@ -18,4 +18,7 @@ int main(){
     //miArbol.buscar(37);
     cout << "PREORDEN\n";
     miArbol.Recorrido();
+    miArbol.generarReporte();
+
+    return 0;
 }
